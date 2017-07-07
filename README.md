@@ -1,2 +1,2 @@
 # zwj
-zwjcps
+1.strToInt ×Ö·û´®×ªÊýÖµ
