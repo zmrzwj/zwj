@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>jquery insertAfter实现</title>
+</head>
+<body>
+<div>
+    <p class="wo">1</p>
+    <p >2</p>
+    <p class="wo">3</p>
+</div>
+
+<div>
+    <p>4</p>
+    <p>5</p>
+    <p class="wo">6</p>
+</div>
+</body>
+<script>
+    /*jquery 把以下放到一起实现的。
+    * appendTo: "append",
+     prependTo: "prepend",
+     insertBefore: "before",
+     insertAfter: "after",
+     replaceAll: "replaceWith"
+    *
+    * */
+    //dom没有提供insertAfter实现，只有insertBefore,
+    //nextSibling 属性返回指定节点之后紧跟的节点，在相同的树层级中。下一个同级节点不存在，则此属性返回值是null。
+    //补充：previousSibling 属性返回同一树层级中指定节点的前一个节点。上一个同级节点不存在，则此属性返回值是null。
+    function insertAfter(content,selector) {
+        var contentDom = toDOM(content);//字符串转DOM
+        //console.log(contentDom);
+        var inserts = document.querySelectorAll(selector);
+        var last = inserts.length -1;
+        //console.log(inserts[2].nextSibling);
+        var elem;
+        for(var i=0;i<=last;i++){
+            elem = i===last?contentDom: contentDom.cloneNode(true);//深拷贝节点
+            after(elem,inserts[i]);
+        }
+    }
+
+    function after(content,insert) {
+        if( insert.parentNode){
+            insert.parentNode.insertBefore(content,insert.nextSibling);//新节点的子节点如果未规定，则 insertBefore 方法会在结尾插入 newnode。
+            console.log("after",insert.nextSibling);
+        }/*else if( insert.parentNode && insert.nextSibling === null){
+            append(content,insert.parentNode);
+            console.log("append",insert.nextSibling);
+        }
+
+        if(insert.nextSibling === null){
+            console.log(null);
+        }*/
+    }
+
+
+    /*function append(content,insert) {
+        insert.appendChild(content);
+    }*/
+
+    function toDOM(content) {
+        var temp = document.createElement("div");
+        //var temp = document.createDocumentFragment();
+        temp.innerHTML = content;
+        return temp.childNodes[0];
+    }
+
+    insertAfter('<span>我是insert</span>',".wo");
+
+</script>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>手写jquery插件</title>
+</head>
+<body>
+<div>
+    <div class="zwj">color</div>
+    <div>color</div>
+    <div class="zwj">color</div>
+    <div>color</div>
+</div>
+</body>
+<script type="text/javascript" src="jquery.js"></script>
+<script>
+//$.fn.extend({}) 添加成员函数
+//jQuery.fn.extend = jQuery.prototype.extend 也相当于jQuery.fn.myTooltip
+//jQuery.extend(object)添加静态方法
+(function ($) {
+    $.fn.extend({
+        tooltip:function (options) {
+            var defaultOptions = {
+                animatePadding:10,
+                color:"#380"
+            };
+            
+            var options = $.extend(defaultOptions,options);
+            this.each(function () {
+                $(this).hover(function(){
+                    $(this).css("color",options.color);
+                },function () {
+                    $(this).css("color","");
+                })
+            })
+        }
+
+    })
+})(jQuery);
+
+    $(".zwj").tooltip();
+
+</script>
+</html>

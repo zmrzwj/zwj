@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>postmessage实现跨域的原理</title>
+</head>
+<body>
+
+</body>
+<script>
+    //HTML5新增加的特性，浏览器的兼容性不是很好，低版本的浏览器不支持
+    //postMessage允许不同源之间的脚本进行通信
+    otherWindow.postMessage(message, targetOrigin);
+    /*
+        otherWindow 引用窗口 iframe.contentwindow 或 window.open返回的对象
+        message 为要传递的数据
+        targetOrigin 为目标源
+    */
+    window.addEventListener("message", function(event){
+        // 验证消息来源
+        if (event.origin !== "http://127.0.0.1") return;
+        console.log(event.source); // 消息源 popup
+        console.log(event.origin); // 消息源URI https://secure.example.NET
+        console.log(event.data); // 来自消息源的数据 hello
+        // 返回数据
+        var message = 'world';
+        event.source.postMessage(message, event.origin);
+    }, false);
+</script>
+</html>

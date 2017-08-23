@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>html模版解析parser</title>
+</head>
+<body>
+<div data-zwj="woo">
+123
+</div>
+</body>
+<script>
+    //document.getElementsByTagName()
+    var custom = document.querySelectorAll("[data-zwj]");
+    var last = custom.length -1;
+
+    console.log(custom);
+    for(var i=0;i<=last;i++){
+        var value = custom[i].getAttribute("data-zwj");
+        //console.log(custom[i].innerHTML)
+        console.log(value);
+    }
+
+
+
+</script>
+</html>
