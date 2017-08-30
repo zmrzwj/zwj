@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>localstorage大小检测</title>
+</head>
+<body>
+
+</body>
+<script>
+    var n10b =    '0123456789';
+    var n100b =   repeat(n10b, 10);
+    var n1kib =   repeat(n100b, 10);
+    var n10kib =  repeat(n1kib, 10);
+    var n100kib = repeat(n10kib, 10);
+    var n1mib =   repeat(n100kib, 10);
+    var n10mib =  repeat(n1mib, 10);
+
+    var values = [n10b, n100b, n1kib, n10kib, n100kib, n1mib, n10mib];
+
+    var iterationsData = [];
+    for(var majorIndex=1;majorIndex<values.length;majorIndex++){
+        var major = values[majorIndex];
+        var minor = values[majorIndex-1];
+        for(var i=0;i<10;i++){
+            for(var j=0;j<10;j++){
+                iterationsData.push([major,minor,i,j]);
+            }
+        }
+    }
+
+    var index = 0;
+    var oldLength = 0;
+
+    function iteration() {
+        var data = iterationsData[index];
+        var major = data[0];
+        var minor = data[1];
+        var i = data[2];
+        var j = data[3];
+
+        var string = repeat(major,i)+repeat(minor,j);
+        var length = string.length;
+
+        if(test(string)){
+            console.log(length);
+        }else {
+            console.log("最大存储："+oldLength*10/(1024*1024)+"M");
+            return ;
+        }
+
+        oldLength = length;
+
+        index++;
+        if(index<iterationsData.length){
+            setTimeout(iteration,0)
+        }else {
+            console.log("最大值超过"+oldLength*10/(1024*1024)+"M，已停止检测")
+        }
+
+    }
+
+
+    function test(value) {
+        try{
+            localStorage.test = value;
+            return true;
+        }catch (e){
+            return false;
+        }
+    }
+    
+    function repeat(string,count) {
+        var array = [];
+        while (count--){
+            array.push(string);
+        }
+
+        return array.join("");
+    }
+
+    iteration();
+
+
+    /*
+     var char = n100kib;
+     var index = 0;
+
+     function size() {
+        try{
+            localStorage.test = repeat(char,index);
+            index++;
+            console.log(index);
+            size();
+        }catch (e){
+            throw Error("最大"+index+"k");
+        }
+    }*/
+
+    //size();
+   /* console.log(char.charCodeAt(1));
+    char.charCodeAt(2);*/
+    
+</script>
+</html>

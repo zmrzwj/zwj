@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Object.create</title>
+</head>
+<body>
+
+</body>
+<script>
+    Object.create = Object.create || function (pro,props) {
+        if(!(pro === null || typeof pro === 'object' || typeof pro === "function"))
+        function F() {
+        }
+        F.prototype = pro;
+        var temp = new F();
+        if(Object.defineProperties){
+            Object.defineProperties(temp,props);
+        }
+
+        return temp;
+    };
+
+    function Parent() {
+        this.a = 1;
+        this.b = 2;
+    }
+
+    var parent = new Parent();
+
+    var child = Object.create(parent,{a:{value:23456},b:{value:10}});
+
+    console.log(child);
+</script>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script>
+    function factorial(n) {
+        if(n<=1){
+            return 1
+        }else {
+            return n*arguments.callee(n-1)
+        }
+    }
+
+    alert(factorial(5));
+
+</script>
+</html>

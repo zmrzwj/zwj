@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>html5shiv.js的工作原理</title>
+    <script>
+        document.createElement("header");
+    </script>
+</head>
+<body>
+<header style="color: #00af89">12345</header>
+</body>
+<!--让CSS 样式应用在未知元素上只需执行 document.createElement(elementName) 即可实现。html5shiv就是根据这个原理创建的。-->
+<!--
+html5shiv.js的原理是在执行时先往head中插入应用到html5标签的css样式，然后对于所有html5标签都执行一次document.createElement(nodeName)，
+\这样，浏览器在渲染body部分时，对于html5标签就能够正确的应用css样式，这也就是html5shiv.js必须放置在head中的原因。-->
+</html>

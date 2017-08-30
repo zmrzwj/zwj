@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Native JavaScript来读写Cookie</title>
+</head>
+<body>
+
+</body>
+<script>
+    //提取cookie中的值
+    function getCookie(name) {
+        var cookieStr = document.cookie;
+        if(cookieStr.length > 0) {
+            var cookieArr = cookieStr.split(";"); //将cookie信息转换成数组
+            for (var i=0; i<cookieArr.length; i++) {
+                var cookieVal = cookieArr[i].split("="); //将每一组cookie(cookie名和值)也转换成数组
+                if(cookieVal[0] == name) {
+                    return unescape(cookieVal[1]); //返回需要提取的cookie值
+                }
+            }
+        }
+    }
+
+</script>
+</html>

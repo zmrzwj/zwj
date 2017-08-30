@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>深拷贝</title>
+</head>
+<body>
+
+</body>
+<script>
+    function clone(target,options) {
+        for(var k in options){
+            var temp = options[k];
+            if(temp instanceof Array){
+                target[k] = clone([],temp);
+            }else if(temp instanceof Object){
+                target[k] = clone({},temp);
+            }else {
+                target[k] = options[k];
+            }
+        }
+        return target;
+    }
+
+    var obj = {
+        a:[{b:123},{c:567}],
+        d:{
+            e:"zwj",
+            f:"zhq"
+        },
+        h:"hello"
+    };
+
+    var cloneObj = {};
+
+    clone(cloneObj,obj);
+
+
+
+    cloneObj.a[0].b = "ttt";
+
+    console.log("obj",obj);
+    console.log("cloneObj",cloneObj);
+
+</script>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>手写一个promise版的ajax </title>
+</head>
+<body>
+
+</body>
+<script>
+    function ajax(url,type,param,async) {
+        return new Promise(function (resolve,reject) {
+            var xhr = new XMLHttpRequest();
+
+            type == null || type.toLowerCase() == "get"?type = "get":type="post";
+            param = formatParam(param);
+            param == null || param == ""?url:url+"?"+param;
+            async === false ? async = false : async=true;
+
+            xhr.open(type,url,async);//async：布尔值，true表示异步，false表示同步（可选，默认为true）
+            type=="post"?xhr.send(param):xhr.send();
+
+            xhr.onreadystatechange = function () {
+                if(xhr.readyState == 4  ){
+                    if(xhr.status == 200){
+                        resolve(xhr.response)
+                    }else {
+                        reject(xhr)
+                    }
+
+                }
+            }
+
+        });
+
+        function formatParam(param) {
+            var array = [];
+            for(let k in param){
+                array.push(k+"="+param[k]);
+            }
+            return array.join("&");
+        }
+    }
+
+    var text = ajax("做三角形.html","get");
+
+    //then(onFulfilld, onRejected)
+    text.then(function (response) {
+        console.log(response);
+    },function (xhr) {
+        console.log(xhr);
+    })
+
+</script>
+</html>

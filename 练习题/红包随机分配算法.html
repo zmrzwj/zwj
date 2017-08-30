@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>红包随机分配算法</title>
+</head>
+<body>
+
+</body>
+<script>
+    function randAlloc(total,min,max,length) {
+        if(min.length>total || max*length<total){
+            throw Error("无法满足分配");
+        }
+
+        const result = [];//保存分的红包
+        result.length = length;
+        //result.fill(-1)
+
+        let restValue = total;
+        let restLength = length ;
+        for(let i=0;i<length-1;i++){
+            restLength--;
+            const restMin = restLength*min;
+            const restMax = restLength*max;
+            const usable = restValue - restMin;//可发量
+            const minValue = Math.max(min,restValue-restMax);//最小量
+            const limit = usable - minValue;
+            var money = Math.min(max, minValue + Math.floor(limit * Math.random()));
+            var position = random_position(result,length-1-i);
+            //console.log("position",length-1-i+":" + position);
+            result[position] = money;
+            restValue -= result[position];
+
+        }
+
+        function random_position(array,max) {
+            var mun = rand_position_helper(0,max);
+            return resolveConflict(array,mun)
+        }
+
+        function rand_position_helper(min,max) {
+            var range = max-min;
+            var rand = min + Math.round(range*Math.random());//Math.floor() 方法执行的是向下取整计算
+            return rand;
+        }
+
+        function resolveConflict(array,num) {
+            /*if(num>array.length){
+                return false;
+            }*/
+            if(array[num] === undefined || array[num] === null){
+                return num;
+            }else {
+                return resolveConflict(array,num+1);
+            }
+        }
+
+        function emptyPosition(array) {
+            for(let i = 0;i<array.length;i++){
+                //console.log(array[i]);
+                if(array[i] === undefined){
+                    return i;
+                }
+            }
+        }
+
+        //console.log("position",length+":" + emptyPosition(result));
+        result[emptyPosition(result)] = restValue;
+
+        return result;
+    }
+
+    for (let i = 0; i < 15; i++) {
+        console.log(randAlloc(50, 1, 10, 10).join(","));
+    }
+    
+    function wechat_money(total,people,min) {
+        var total_money = total;
+        var total_people = people;
+        var result = [];
+
+        for(let i=0;i<total_people-1;i++){
+            var j = i+1;
+            var safe_money = (total_money - (total_people - j)*min)/(total_people-j);
+            var temp_money = (Math.random()*(safe_money*100-min*100)+min*100)/100;
+            total_money = total_money - temp_money.toFixed(2);
+
+            result[i] = temp_money.toFixed(2);
+        }
+
+
+
+        return result;
+
+    }
+
+
+
+    for (let i = 0; i < 15; i++) {
+        console.log(wechat_money(100, 10, 1).join(","));
+    }
+
+</script>
+</html>

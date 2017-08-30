@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script>
+    function getLastElement(stack){
+        var result = stack.pop();
+        if(stack.length === 0){
+            return result;
+        }else {
+            var i = getLastElement(stack);
+            console.log(i);
+            stack.push(result);
+            return i;
+        }
+    }
+
+    function reverse(stack) {
+        if(stack.length === 0){
+            return ;
+        }
+
+        var i = getLastElement(stack);
+        reverse(stack);
+        stack.push(i);
+
+    }
+
+
+    var test = [1,2,3,4,5,6,7,8,9];
+    reverse(test);
+
+    console.log(test)
+
+</script>
+</html>

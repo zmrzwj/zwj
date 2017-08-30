@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>左边定宽，右边自适应布局的几种方法</title>
+</head>
+<style>
+    html{
+        height: 100%;
+    }
+    body{
+        margin: 0;
+        height: 100%;
+    }
+    .main{
+        width: 100%;
+    }
+
+    .left{
+        float: left;
+        width: 200px;
+        background: red;
+    }
+
+    .right{
+        width: 100%;
+        background: #00af89;
+    }
+
+    .main_two{
+        display: flex;
+    }
+
+    .left_two{
+        width: 200px;
+        background: red;
+    }
+
+    .right_two{
+        flex: 1;
+        background: #00af89;
+    }
+
+    .flex{
+        display: flex;
+        flex-flow: column;
+        height: 100%;
+    }
+
+
+    .one{
+        flex: 1;
+        background: #00af89;
+    }
+
+    .two{
+        flex: 2;
+        background: #f4c430;
+    }
+
+    .three{
+        flex: 1;
+        background: #1b6d85;
+    }
+
+    .main_three{
+        position: absolute;
+        width: 100%;
+    }
+
+    .left_three{
+        width: 200px;
+        float: left;
+        background: red;
+    }
+
+    .right_three{
+        left: 200px;
+        right: 0;
+        background: #00af89;
+    }
+
+
+</style>
+<body>
+
+<Div class="main">
+    <div class="left">123</div>
+    <div class="right">123</div>
+</Div>
+
+<div class="main_two">
+    <div class="left_two">123</div>
+    <div class="right_two">123</div>
+</div>
+
+<div class="flex">
+    <div class="one">1</div>
+    <div class="two">2</div>
+    <div class="three">3</div>
+</div>
+
+<div class="main_three">
+    <div class="left_three">123</div>
+    <div class="right_three">123</div>
+</div>
+
+</body>
+<script>
+
+</script>
+</html>

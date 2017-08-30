@@ -62,7 +62,7 @@
     }*/
 
     function toDOM(content) {
-        var temp = document.createElement("div");
+        var temp = document.createElement("div");//tr并不能直接放进div里
         //var temp = document.createDocumentFragment();
         temp.innerHTML = content;
         return temp.childNodes[0];

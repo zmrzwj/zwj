@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>取消浏览器右键</title>
+</head>
+<body>
+<div id="menu" style="width: 200px;height: 300px;background: #00af89;border-radius: 5px;display: none;position: absolute;box-shadow: 5px 5px 10px #666">
+
+</div>
+</body>
+<script>
+    document.oncontextmenu = function(){
+        return false;
+    };
+    var menu = document.getElementById("menu");
+    document.onmousedown = function (event) {
+        //event.button 2右键    0 左键    1 滚轮
+        if(event.button === 2){
+            var x = event.clientX;
+            var y = event.clientY;
+
+            console.log(event);
+            console.log(x);
+            console.log(y);
+
+            menu.style.top = y+"px";
+            menu.style.left = x+"px";
+
+            menu.style.display = "block";
+        }
+    }
+    
+</script>
+</html>

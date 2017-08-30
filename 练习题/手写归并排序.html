@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>手写归并排序</title>
+</head>
+<body>
+
+</body>
+<script>
+    //归并排序的时间复杂度为O(nlogn)，其空间复杂度为O(n)，稳定
+    //合并两个数组的函数
+    //不断分割直到不能分。然后将两个或多个已排序的表合并成一个表。
+
+
+    function merge(left,right) {
+        let array = [];
+        while(left.length && right.length){
+            if(left[0]<=right[0]){
+                array.push(left.shift());
+            }else{
+                array.push(right.shift());
+            }
+        }
+
+        return array.concat(left,right);
+    }
+
+    function mergeSort(array) {
+        let length = array.length;
+        if(length > 1){
+            let index = length/2;
+            let left = array.slice(0,index);
+            let right = array.slice(index);
+
+            return merge(mergeSort(left),mergeSort(right));
+        }else{
+            return array;
+        }
+    }
+
+
+   /* function merge(first,second) {
+        var array = [];
+        while (first.length && second.length){
+            if(first[0]<=second[0]){
+                array.push(first.shift());//shift去掉，脱掉
+            }else{
+                array.push(second.shift());
+            }
+        }
+
+        return array.concat(first,second);
+    }
+
+
+    function mergeSort(array) {
+        var length = array.length;
+        if(length>1){
+            var index = length/2;//分割点
+            var left = array.slice(0,index);
+            var right = array.slice(index);
+
+            return merge(mergeSort(left),mergeSort(right));//里面采用递归
+
+        }else {
+            return array;
+        }
+    }
+*/
+    let test = [21,442,1,34,13,78,56,8,21,70];
+    console.log(mergeSort(test));
+
+</script>
+</html>

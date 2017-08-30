@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>手写一款 Promise</title>
+</head>
+<body>
+
+</body>
+<script>
+    /*
+    * Promise 对象有三种状态：
+     Fulfilled 可以理解为成功的状态
+     Rejected 可以理解为失败的状态
+     Pending 既不是 Fulfilld 也不是 Rejected 的状态，可以理解为 Promise 对象实例创建时候的初始状态
+
+     then 和 catch
+     catch()的作用是捕获Promise的错误，与then()的rejected回调作用几乎一致。但是由于Promise的抛错具有冒泡性质，能够不断传递，
+     这样就能够在下一个catch()中统一处理这些错误。同时catch()也能够捕获then()中抛出的错误，所以建议不要使用then()的rejected回调，而是统一使用catch()来处理错误
+     then(onFulfilld, onRejected)
+
+     Promise.done() / Promise. finally()
+     Promise.done() 的用法类似 .then() ，可以提供resolved和rejected方法，也可以不提供任何参数，它的主要作用是在回调链的尾端捕捉前面没有被 .catch() 捕捉到的错误
+     Promise. finally() 接受一个方法作为参数，这个方法不管promise最终的状态是怎样，都一定会被执行
+
+     Promise.all()
+     Promise.all 可以接收一个元素为 Promise 对象的数组作为参数，当这个数组里面所有的 Promise 对象都变为 resolve 时，该方法才会返回。
+     var p1 = new Promise();  var p2 = new Promise(); Promise.all([p1, p2]).then()
+
+     Promise.race()
+     “竞速”方法，参数与Promise.all()相同，不同的是，参数中的p1、p2、p3只要有一个改变状态，promise就会立刻变成相同的状态并执行对于的回调.
+     ar promise = Promise.race( [p1, p2, p3] )
+     promise.then(...).catch(...)
+     */
+
+    function promise(executor) {
+        if( typeof  executor !== "function"){
+            throw "promise params must be function";
+        }
+
+        if(!(this instanceof promise)){
+            throw "请使用new关键字，创建实例";
+        }
+
+        this.value = null;
+        this.status = "pending";//初始状态
+        this.catchHandle = null;//catch回调
+        this.thenCache = [];//then回调，可能有多个then
+
+        var self = this;
+
+        //使用setTimeout，让then，catch先执行
+        setTimeout(function(){
+            try{
+                executor.call(self, self.resolve.bind(self), self.reject.bind(self));//传递resolve，reject方法 ,注意：bind方法的返回值是函数
+            }catch(e){
+                self.reject(e);
+            }
+        },0);
+
+        return this;
+    }
+
+    promise.prototype.resolve = function (value) {
+        this.status = 'fulfilled';
+        this.value = value ;
+        this.doThen();
+    };
+
+    promise.prototype.reject = function (error) {
+        this.status = "rejected";
+        this.value = error;
+        this.doThen();
+    };
+
+    promise.prototype.then = function (onFulfilled,onRejected) {
+        this.thenCache.push({
+            onFulfilled:onFulfilled,
+            onRejected:onRejected
+        });
+
+        return this;
+    };
+    
+    promise.prototype.doThen = function () {
+
+        var current = this.thenCache.shift();
+        var callback = null;
+
+        if(!current && this.status === "fulfilled"){//如果为空，且status == "fulfilled"
+            return this;
+        }else if(!current && this.status === "rejected"){
+            if(this.catchHandle){
+                this.value = this.catchHandle.call(undefined,this.value);//回调函数使用return提供了返回值；
+                this.status = "fulfilled"
+            }
+
+            return this;
+        }
+
+        if(this.status === "fulfilled"){
+            callback = current["onFulfilled"];
+        }else if(this.status === "rejected"){
+            callback = current["onRejected"];
+        }
+
+        if(typeof callback === "function"){
+            try{
+                this.value = callback.call(undefined,this.value);
+                this.status = "fulfilled";
+                this.doThen();//继续执行doThen，直到thenCache为空
+            }catch (e){
+                this.status = "rejected";
+                this.value = e;
+                return this.doThen();
+            }
+        }else {//不是函数忽略
+            this.doThen();
+        }
+
+
+    };
+    
+    promise.prototype.catch = function (fn) {
+        if(typeof fn === "function"){
+            this.catchHandle = fn;
+        }
+    };
+
+
+//测试
+    function ajax() {
+        return new promise(function (resolve,reject) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("get","做三角形.html");
+            xhr.send();
+            xhr.onreadystatechange = function () {
+                if(xhr.readyState == 4 && xhr.status ==200){
+                    resolve(xhr.response);
+                }
+            }
+        })
+    }
+
+    ajax().then(function (data) {
+        console.log(data);
+    })
+    
+    
+
+</script>
+</html>
