@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../../vue2-elm-master/src/main.js"></script>
+</head>
+<body>
+<!--
+vue2.0没有内置过滤器，需要自己定义
+过滤器使用添加的全局的过滤器使用时，必须定义在 Vue实例初始化前面,否则过滤器定义无效
+Vue.filter("my-filter",function(){})
+new Vue({filters:{
+    caseUp:function(){}
+})
+
+computed
+当模板中放入太多的逻辑，模板过重且难以维护时，你都应当使用计算属性。
+不同的是计算属性是基于它的依赖缓存,而methods不依赖缓存，每一次都需要重新执行；
+计算属性只有在它的相关依赖属性值发生改变时才会重新取值。
+
+观察 Watchers
+
+虽然计算属性在大多数情况下更合适，但有时也需要一个自定义的 watcher 。这是为什么 Vue 提供一个更通用的方法通过 watch 选项，
+来响应数据的变化。当你想要在数据变化响应时，执行异步操作或开销较大的操作，这是很有用的。
+使用 watch 选项允许我们执行异步操作（访问一个 API），限制我们执行该操作的频率，并在我们得到最终结果前，设置中间状态。
+这是计算属性无法做到的。
+
+-->
+</body>
+</html>

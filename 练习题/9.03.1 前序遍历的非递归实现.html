@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>前序遍历的非递归实现</title>
+</head>
+<body>
+
+</body>
+<script>
+    var tree = {
+        data:1,
+        left:{
+            data:2,
+            left:{
+               data:3
+            },
+            right:{
+                data:11,
+                left:{
+                    data:4
+                },
+                right:{
+                    data:5
+                }
+            }
+        },
+        right:{
+            data:6,
+            left:{
+                data:7,
+                left:{
+                    data:8
+                }
+            },
+            right:{
+                data:9,
+                left:{
+                    data:10
+                }
+            }
+        }
+    }
+
+    var tree2 = {
+        data:1,
+        left:{
+            data:2,
+            left:{
+                data:3
+            },
+            right:{
+                data:4
+            }
+        }
+    }
+</script>
+<script>
+    //先序遍历
+    function preOrder(tree) {
+        if(tree === null || tree.toString() == "{}"){
+            return;
+        }
+        var t = tree;
+        var stack = [];
+
+        stack.push(t);
+
+        while (stack.length !== 0){
+            t = stack.pop();
+            console.log(t.data);
+            if(t.right){
+                stack.push(t.right);
+            }
+            if(t.left){
+                stack.push(t.left);
+            }
+        }
+    }
+
+    //中序遍历
+    function inOrder(tree){
+        if(tree === null || tree.toString() == "{}"){
+            return;
+        }
+        var t = tree;
+        var stack = [];
+
+        //stack.push(t);
+        while( t || stack.length !== 0){
+            while(t){
+                stack.push(t);
+                t = t.left;
+            }
+            if(stack.length !== 0){
+
+                t = stack.pop();
+                console.log(t.data);
+                t = t.right;
+            }
+
+
+        }
+    }
+
+    //后序遍历
+    function postOrder(tree) {
+        if(tree === null || tree.toString() == "{}"){
+            console.log("空对象");
+            return ;
+        }
+        var t = tree;
+        var stack = [];
+        var pre = null;
+
+        //stack.push(t);
+       //先把t移动到左子树最下边
+        while(t){
+            stack.push(t);
+            t = t.left;
+        }
+
+        while (stack.length !== 0){
+            t = stack.pop();
+            //无右子树或右子树已被访问过
+            if( t.right == undefined || t.right == pre){
+                console.log(t.data);
+                pre = t;
+            }else {
+                stack.push(t);
+                //进入右子树，且可肯定右子树一定不为空
+                t = t.right;
+                while(t){
+                    stack.push(t);
+                    t = t.left
+                }
+            }
+        }
+    }
+
+
+
+    //1 2 3 11 4 5 6 7 8 9 10
+    //preOrder(tree);
+
+    //3 2 4 11 5 1 8 7 6 10 9
+    //inOrder(tree2);
+
+    //3 4 5 11 2 8 7 10 9 6 1
+    postOrder(tree)
+
+</script>
+</html>

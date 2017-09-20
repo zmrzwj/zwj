@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script>
+    function rank(string) {
+        var result = [];
+        var stringArr = string.split("");
+
+        function help(stringArray,array) {
+            var length = stringArray.length;
+            if(length == 1){
+                result.push([].concat(array,stringArray));
+            }else if(length>1){
+                for(let i=0;i<length;i++){
+                    var arrayChild = [];
+                    arrayChild.push(stringArray[i]);
+                    var deepCopy = stringArray.slice(0);
+                    arrayChild = array.concat(arrayChild);
+                    deepCopy.splice(i,1);
+                    //console.log("arrayChild:",arrayChild);
+                    help(deepCopy,arrayChild);
+                }
+            }
+        }
+
+        help(stringArr,[]);
+
+        console.log(result);
+
+    }
+
+
+    function permute(input) {
+        var permArr = [],
+            usedChars = [];
+        function main(input){
+            var i, ch;
+            for (i = 0; i < input.length; i++) {
+                ch = input.splice(i, 1)[0];
+                usedChars.push(ch);
+                if (input.length == 0) {
+                    permArr.push(usedChars.slice());//slice()深拷贝一份数据
+                }
+                main(input);
+                input.splice(i, 0, ch);//如果设置为 0，则不会删除项目。把splice的元素还原
+                usedChars.pop();//弹出，保证usedChars还为之前状态
+            }
+            return permArr
+        }
+        return main(input);
+    };
+
+    function permAlone(str) {
+
+
+        var regex = /(.)\1+/g;
+
+        var permutate=function(str) {
+
+            var result=[];
+            if(str.length==1){
+                return [str];
+            }else{
+
+                var preResult=permutate(str.slice(1));
+                //console.log(preResult);
+                for (var j = 0; j < preResult.length; j++) {
+                    //console.log("preResult[j]:",preResult[j]);
+                    for (var k = 0; k < preResult[j].length+1; k++) {
+                        var temp=preResult[j].slice(0,k)+str[0]+preResult[j].slice(k);//把3放到4前后
+                        //console.log("tmp:",temp);
+                        result.push(temp);
+
+                    }
+                }
+
+                return result;//["34","43"]
+            }
+        };
+
+        var permutations= permutate(str);
+
+
+        var filtered = permutations.filter(function(string) {
+            return !string.match(regex);
+        });
+        
+        return permutations;
+    }
+
+
+
+    function combination(array,n) {
+        if(!Array.isArray(array)){
+            console.log("not a array");
+            return;
+        }
+
+        if(array.length<n){
+            console.log("长度不够！");
+            return;
+        }
+
+        var result = [];
+
+
+        function help(array,arg,num) {
+            var length = array.length;
+            if(num === 0){
+                result.push(arg);
+            }
+            for(let i=0;i<length;i++){
+                var temp = arg.slice(0);
+                temp.push(array[i]);
+                console.log(temp);
+                help(array.slice(i+1),temp,num-1);
+            }
+
+
+        }
+
+        help(array,[],n);
+
+        console.log("result:",result);
+    }
+    
+    
+    //test
+    var a = "1234567890";
+    var start = new Date().getTime();
+   // rank(a);
+   // console.log(permute([1, 2, 3, 4,5,6,7,8,9,0]));
+    var end = new Date().getTime();
+
+    console.log(end-start);
+
+    start = new Date().getTime();
+   // rank(a);
+    //console.log(permute([1, 2, 3, 4,5,6,7,8,9,0]));
+    end = new Date().getTime();
+
+    console.log(end-start);
+
+    start = new Date().getTime();
+   // console.log(permAlone(a));//最快
+    //console.log(permute([1, 2, 3, 4,5,6,7,8,9,0]));
+    end = new Date().getTime();
+
+    console.log(end-start);
+
+    combination([1,2,3,4,5,6,7,8,9],3);
+
+</script>
+</html>

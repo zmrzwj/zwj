@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>前端模块化，commonjs原理，如果要你自己实现怎么实现，怎么处理模块间的依赖关系；</title>
+</head>
+<body>
+commonjs原理:
+require实现：
+// 引入nodejs 文件模块 下面是nodejs中原生的require方法
+var fs = require('fs');//使用fs读取文件
+
+模块引用：
+require一个模块时大致经历了这几步：
+路径分析
+文件定位
+编译执行
+
+
+module.exports 和 exports
+导出模块
+
+
+模块路径： 查找规则是沿路径向上逐级递归，直到根目录的node_modules目录
+
+模块依赖：
+AMD 是提前执行，CMD 是延迟执行。
+如果这个模块还依赖其他模块，那么define()函数的第一个参数，必须是一个数组，指明该模块的依赖性。
+require()函数加载上面这个模块的时候，就会先加载其文件。
+
+</body>
+</html>

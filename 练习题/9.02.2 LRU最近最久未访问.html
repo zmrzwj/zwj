@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LRU最近最久未访问</title>
+</head>
+<body>
+
+</body>
+<script>
+    //最近访问的放入栈底，未访问的放到栈顶随时替换出去。
+    function LRU(array,MaxSize) {
+        var stack = [];
+        var length = MaxSize;
+        var tabPage = array.length;
+
+        array.forEach(function (v) {
+            var index = stack.indexOf(v);
+            if(index !== -1){
+                tabPage--;
+                stack.splice(index,1);
+                stack.unshift(v);
+            }else {
+                if(stack.length<length){
+                    stack.unshift(v)
+                }else{
+                    stack.pop();
+                    stack.unshift(v);
+                }
+            }
+            console.log(stack);
+        });
+
+        console.log("缺页次数：",tabPage);
+    }
+
+    function random(number,weight) {
+        var array = [];
+        for(let i=0;i<number;i++){
+            array.push(Math.floor(Math.random()*weight))
+        }
+        return array;
+    }
+
+    var test = random(20,10);
+    console.log("test",test);
+    LRU([1,2,3,4,2,1,5,6,2,1,2,3,7,6,3,2,1,2,3,6],4);
+
+</script>
+
+//猪：LFU最不经常使用页置换算法，要求在页置换时置换引用计数最小的页。
+</html>

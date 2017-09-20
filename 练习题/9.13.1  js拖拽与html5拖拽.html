@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!--
+原生拖拽：
+onmousedown
+onmousemove
+onmouseup
+实现的效果是：
+鼠标按下后，才可以执行后续效果
+鼠标已经按下，然后鼠标移动，需要拖拽的元素跟着一起移动
+鼠标松开，然后停止移动
+需要移动的元素的position属性应该设为absolute或者relative。
+碰撞检测：
+检测位置重合或者边重合
+
+
+
+html5拖拽
+dragstart,dragend
+dragenter,dragover,drop,dragleave
+在ondragover中一定要执行preventDefault()，否则ondrop事件不会被触发。
+
+
+-->
+<div id="drag" style="position: absolute;background: red;width: 200px;height: 300px;top:0;left:0">123</div>
+<div id="drag5" style="position: absolute;background: red;width: 200px;height: 300px;top:0;left:0" draggable="true">123</div>
+</body>
+<script>
+var drag  = document.getElementById("drag");
+var mousedownX;
+var mousedownY ;
+
+var domX;
+var domY;
+var flag;
+function mouseMove(e) {
+    if(flag){
+        var x = e.clientX;
+        var y = e.clientY;
+        //console.log(x);
+        //console.log(e);
+        drag.style.top = y-(mousedownY-domY)+'px';
+        drag.style.left = x-(mousedownX-domX)+'px';
+
+        console.log("y-mousedownY-domY",y-mousedownY-domY);
+    }
+
+}
+drag.addEventListener("mousedown",function (e) {
+
+    mousedownX = e.clientX;
+    mousedownY = e.clientY;
+
+    console.log("mousedownX",mousedownX);
+    console.log("mousedownY",mousedownY);
+
+    domX = drag.style.left.replace("px","");
+    domY = drag.style.top.replace("px","");
+
+    console.log("domX",domX);
+    console.log("domY",domY);
+
+    flag = true;
+});
+drag.addEventListener("mousemove",mouseMove);
+
+drag.addEventListener("mouseup",function (e) {
+    console.log("up");
+    flag = false;
+});
+
+
+
+
+</script>
+</html>

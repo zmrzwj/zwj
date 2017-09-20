@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>深度优先 广度优先</title>
+</head>
+<body>
+
+</body>
+<script>
+    //深度优先
+    //递归实现
+    var DFSdArray = [];
+    function DFSd(tree) {
+        if(!tree || tree.length === 0){
+            return;
+        }
+
+        for(let i=0;i<tree.length;i++){
+            var children = tree[i].children;
+            //console.log(tree[i].id);
+            DFSdArray.push(tree[i].id);
+            DFSd(children);
+        }
+
+    }
+    
+    function DFS(tree) {
+        if(!tree || tree.length === 0){
+            return;
+        }
+
+        var result = [];
+
+        var stack = [];
+
+        //把第一层放入
+        for(let i=tree.length-1;i>=0;i--){
+            stack.push(tree[i]);
+        }
+
+        while (stack.length !== 0){
+            var current = stack.pop();
+            result.push(current["id"]);
+            var children = current.children;
+            if(children){
+                for(let i=children.length-1;i>=0;i--){
+                    stack.push(children[i]);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    
+
+
+</script>
+<script>
+    //广度优先
+    /*function BFSd(tree) {
+        if(!tree || tree.length === 0){
+            return;
+        }
+    }*/
+    function BFS(tree) {
+
+        if(!tree || tree.length === 0){
+            return;
+        }
+
+        var result = [];
+
+        var queue = [];
+        queue.push(tree);
+        while (queue.length !== 0){
+            var current = queue.shift();
+            if(current.length>0){
+                current.forEach(function (v) {
+                    //console.log(v.id);
+                    result.push(v.id);
+                    if(v.children){
+                        queue.push(v.children);
+                    }
+                })
+            }
+        }
+
+        return result;
+
+    }
+</script>
+<script>
+    //test
+    var tree = [
+        {
+            id:1,
+            children:[
+                {
+                    id:2,
+                    children:[
+                        {
+                            id:3,
+                            children:[
+                                {
+                                    id:4
+                                }
+                            ]
+                        },
+                        {
+                            id:5,
+                            children:[
+                                {
+                                    id:6
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id:7,
+                    children:[
+                        {
+                            id:8
+                        },
+                        {
+                            id:9
+                        },
+                        {
+                            id:10
+                        }
+                    ]
+                },
+                {
+                    id:11
+                }
+            ]
+        }
+    ];
+
+    //1 2 3 4 5 6 7 8 9 10 11
+    DFSd(tree);
+    console.log("深度优先-递归实现:",DFSdArray);
+    console.log("深度优先-非递归实现:",DFS(tree));
+
+    //1 2 7 11 3 5 8 9 10 4 6
+   // BFSd(tree);
+
+    console.log("广度优先:",BFS(tree));
+
+</script>
+</html>

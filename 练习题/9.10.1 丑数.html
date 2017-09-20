@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script>
+    function isUgly(number) {
+        while(number%2 === 0){
+            number = number/2;
+        }
+
+        while (number%3 === 0){
+            number = number/3;
+        }
+
+        while (number%5 === 0){
+            number = number/5;
+        }
+
+        return number === 1 ?true:false;
+    }
+
+    function ugly(index) {
+        var result = [1];
+        var i=2;
+        while (result.length<index){
+            if(isUgly(i)){
+                result.push(i);
+            }
+
+            i++;
+        }
+
+        console.log(result);
+
+        return result.pop();
+    }
+
+
+
+    //console.log(ugly(10));
+
+
+
+    function findK(length,array) {
+        var result = [];
+        var pre = null;
+        var temp = [];
+        for(let i=0;i<length-1;i++){
+            if(array[i] === 0){
+                result.push([0]);
+            }else {
+               // console.log("array[i]",array[i]);
+                if((array[i]^array[i+1]) === 0){
+                    //console.log("array/l",array[i],array[i+1]);
+                    if(pre === null){
+                        temp.push(array[i],array[i+1]);
+                        pre = array[i+1];
+                        result.push(temp.slice(0));
+                    }else {
+                        temp.push(array[i+1]);
+                        result.pop();
+                        result.push(temp.slice(0));
+                        pre = array[i+1];
+                    }
+                }else {
+                    pre = null;
+                    temp = [];
+                }
+            }
+        }
+
+        return result.length;
+    }
+
+    var length = 4;
+    var array = [3,0,2,2];
+
+    findK(length,array);
+
+
+
+
+
+</script>
+</html>

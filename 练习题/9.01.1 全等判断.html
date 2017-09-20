@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>全等判断</title>
+</head>
+<body>
+
+</body>
+<script>
+
+    function isEqual(objOne,objTwo) {
+        var toString = Object.prototype.toString;
+
+        if(objOne === objTwo){
+            return true;
+        }
+
+        if(toString.call(objOne) !== toString.call(objTwo)){
+            return false;
+        }
+
+        if(toString.call(objOne) == "[object Object]"){
+
+            if(Object.keys(objOne).length !== Object.keys(objTwo).length){
+                return false;
+            }
+
+            for(let i in objOne){
+                let flag = isEqual(objOne[i],objTwo[i]);
+                if(flag === false){
+                    return false;
+                }
+            }
+
+            return true;
+
+        }else if(toString.call(objOne) == "[object Array]"){
+
+            if(objOne.length !== objTwo.length){
+                return false;
+            }
+
+            for(let i =0 ;i<objOne.length;i++){
+                let flag = isEqual(objOne[i],objTwo[i]);
+                if(flag === false){
+                    return false;
+                }
+            }
+
+            return true;
+
+        } else {
+            return false;
+        }
+
+    }
+
+
+
+    //test
+    console.log("null,null",isEqual(null,null));
+    console.log("undefined,nul",isEqual(undefined,null));
+    console.log("'',null",isEqual("",null));
+    console.log('"123",123',isEqual("123",123));
+    console.log('"123","123"',isEqual("123","123"));
+    console.log("false,false",isEqual(false,false));
+    console.log("false,[]",isEqual(false,[]));
+    console.log("[],[]",isEqual([],[]));
+    console.log("[1],[2]",isEqual([1],[2]));
+    console.log("[],[2]",isEqual([],[2]));
+    console.log("[{}],[{}]",isEqual([{}],[{}]));
+    console.log('{123:"1",2345:"2"},{123:"1",2345:"2"}',isEqual([{123:"1",2345:"2"}],[{123:"1",2345:"2"}]));
+    console.log('{123:"1",2345:"2"},{123:"1",2345:"3"}',isEqual([{123:"1",2345:"2"}],[{123:"1",2345:"3"}]));
+    console.log('[{123:"1",2345:"2"}],[{123:"1",235:"2"}]',isEqual([{123:"1",2345:"2"}],[{123:"1",235:"2"}]));
+    console.log('{123:[1,2]},{123:[1,2]}',isEqual({123:[1,2]},{123:[1,2]}));
+    console.log('{123:[]},{123:[1,2]}',isEqual({123:[]},{123:[1,2]}));
+
+
+
+
+
+
+
+
+
+</script>
+</html>

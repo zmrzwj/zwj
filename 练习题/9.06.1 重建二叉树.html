@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script>
+    //前序遍历序列{1,2,4,7,3,5,6,8}和中序遍历序列{4,7,2,1,5,3,8,6}，则重建二叉树并返回
+    
+    function rebuildTree(preOrder,inOrder){
+        if(preOrder.length === 0 || inOrder.length === 0){
+            return;
+        }
+
+        var tree = {
+            data:preOrder[0]
+        };
+
+        for(let i=0;i<inOrder.length;i++){
+            if(inOrder[i] == preOrder[0]){
+                tree.left = rebuildTree(preOrder.slice(1,i+1),inOrder.slice(0,i));
+                tree.right = rebuildTree(preOrder.slice(i+1),inOrder.slice(i+1));
+            }
+        }
+
+        return tree;
+    }
+
+    function rebuildTree2(postOrder,inOrder) {
+        if(postOrder.length === 0 || inOrder.length === 0){
+            return;
+        }
+
+        console.log("postOrder",postOrder);
+        console.log("inOrder",inOrder);
+
+        var last = postOrder.length-1;
+
+        var tree = {
+            data:postOrder[last]
+        };
+
+        for(let i=0;i<inOrder.length;i++){
+            if(postOrder[last] === inOrder[i]){
+                tree.left = rebuildTree2(postOrder.slice(0,i),inOrder.slice(0,i));
+                tree.right = rebuildTree2(postOrder.slice(i,last),inOrder.slice(i+1));
+            }
+        }
+
+
+        //console.log("tree",tree);
+        return tree;
+
+    }
+
+
+    function post(tree) {
+        if(tree.toString() == "{}" || typeof tree != "object"){
+            console.log("nothing");
+            return;
+        }
+
+        var t = tree;
+        var stack = [];
+        var pre = null;
+
+        while(t){//把左边全部放入栈
+            stack.push(t);
+            t = t.left;
+        }
+
+        while(stack.length !== 0){
+            t = stack.pop();
+            if( !t.right || pre == t.right){
+                console.log(t.data);
+                pre = t;
+            }else{
+                stack.push(t);
+                t = t.right;
+                while (t){
+                    stack.push(t);
+                    t = t.left;
+                }
+            }
+
+        }
+
+
+    }
+
+    //先序遍历
+    function pre(tree) {
+        if(tree === null || tree.toString() == "{}"){
+            return;
+        }
+        var t = tree;
+        var stack = [];
+
+        stack.push(t);
+
+        while (stack.length !== 0){
+            t = stack.pop();
+            console.log(t.data);
+            if(t.right){
+                stack.push(t.right);
+            }
+            if(t.left){
+                stack.push(t.left);
+            }
+        }
+    }
+
+
+
+    //先序遍历第一个位置是根节点treeNode，中序遍历的根节点位置在中间p，在p左边的肯定是treeNode的左子树的中序数组，p右边的肯定是treeNode的右子树的中序数组；
+    // 另一方面，先序遍历的第二个位置到p，也是treeNode左子树的先序子数组，剩下p右边的就是treeNode的右子树的先序子数组，把四个数组找出来，分左右递归调用即可。
+    var preOrder = [1,2,4,7,3,5,6,8];
+    var inOrder = [4,7,2,1,5,3,8,6];
+    //console.log(rebuildTree(preOrder,inOrder));
+
+    //7 4 2 5 8 6 3 1
+    //post(rebuildTree(preOrder,inOrder));
+
+    var postOrder = [7 ,4 ,2 ,5 ,8 ,6 ,3 ,1];
+    pre(rebuildTree2(postOrder,inOrder));
+
+    
+</script>
+</html>

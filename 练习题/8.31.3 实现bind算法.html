@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>实现bind算法</title>
+</head>
+<body>
+
+</body>
+<script>
+    Function.prototype.bind = function(){
+        var self = this;
+        var context = [].shift.call(arguments);// 需要绑定的this上下文
+        console.log(context);
+        var args = [].slice.call(arguments);// 剩余的参数转成数组
+        return function () {
+            // 并且组合两次分别传入的参数，作为新函数的参数
+            return self.apply(context,[].concat.call(args,[].slice.call(arguments)));
+        }
+    }
+
+    var altwrite = document.write;
+    //altwrite("hello");
+    /*
+    * altwrite()函数改变this的指向global或window对象，导致执行时提示非法调用异常，
+    * \正确的方案就是使用bind()方法
+    * */
+    altwrite.bind(document)("hello")
+
+
+</script>
+
+
+</html>

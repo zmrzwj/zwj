@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>筛选素数</title>
+</head>
+<body>
+
+</body>
+<script>
+
+    //经典算法
+    function prime(number) {
+        if(number<2){
+            return [];
+        }
+
+        if(number==2){
+            return [2];
+        }
+
+        var result = [false,false,true];
+
+        for(let i=3;i<number;i++){
+            result[i] = true;
+            for(let j=2;j<=Math.ceil(Math.sqrt(i));j++){
+                if(i%j === 0){
+                    result[i] = false;
+                }
+            }
+        }
+
+        var primeArray =[];
+        for(let i=0;i<result.length;i++){
+            if(result[i] == true){
+                primeArray.push(i);
+            }
+        }
+
+       // console.log(primeArray.join(","));
+        console.log(primeArray.length);
+    }
+
+
+    //厄拉多塞筛法 O(NloglogN)
+    function primeUpdate(number) {
+        if(number<2){
+            return [];
+        }
+
+        if(number==2){
+            return [2];
+        }
+
+        var result = new Array(number+1);
+        result.fill(true);
+        result[0] =false;
+        result[1]=false;
+
+        for(let i=2;i<=Math.ceil(Math.sqrt(number));i++){
+            if(result[i] == true){
+                for(let j=i+1;j<number+1;j++){
+                    if(j%i == 0){
+                        result[j] = false;
+                    }
+                }
+            }
+        }
+
+        var primeArray =[];
+        for(let i=0;i<result.length;i++){
+            if(result[i] == true){
+                primeArray.push(i);
+            }
+        }
+
+        console.log("primeUpdate:");
+        //console.log(primeArray.join(","));
+        console.log(primeArray.length);
+
+    }
+
+    //Miller-Rabin素性测试法
+
+    //test
+    var test = 100000000;
+
+    var start = new Date().getTime();
+    prime(test);
+    var end = new Date().getTime();
+
+    console.log("time:",end-start);
+
+
+    start = new Date().getTime();
+    primeUpdate(test);
+    end = new Date().getTime();
+    console.log("time:",end-start);
+
+
+</script>
+</html>

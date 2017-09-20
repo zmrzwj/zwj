@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script>
+    function people(name) {
+        this.name = name
+    }
+    
+    people.prototype.print = function () {
+        var _this = this;
+        Object.keys(_this).forEach(function (v) {
+            console.log(v,':',_this[v]);
+        });
+        //console.log("hello");
+    };
+    
+    function teacher(name,class_) {
+        this.class_ = class_;
+        people.call(this,name);//this无法访问原型链上的东西
+    }
+
+    teacher.prototype = new people();
+
+    var teacherOne = new teacher("zwj",123);
+
+    var people = new people("zzz");
+    console.log(people);
+    console.log(people.print());
+    console.log(teacherOne);
+    console.log(teacherOne.print());
+
+    
+</script>
+</html>

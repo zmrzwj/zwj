@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script>
+    //循环里面包含闭包函数
+    function box(){
+        var arr = [];
+        for(var i=0;i<5;i++){
+            arr[i] = function(){
+                return i;                            //由于这个闭包的关系，他是循环完毕之后才返回，最终结果是4++是5
+            }                                        //这个匿名函数里面根本没有i这个变量，所以匿名函数会从父级函数中去找i，
+        }                                            //当找到这个i的时候，for循环已经循环完毕了，所以最终会返回5
+        return arr;
+    }
+    //alert(box());                                    //执行5次匿名函数本身
+    //alert(box()[1]);　　　　　　　　　　　　　　　　　　　//执行第2个匿名函数本身
+    //alert(box().length);                            //最终返回的是一个数组，数组的长度为5
+    //alert(box()[0]());                                //数组中的第一个数返回的是5，这是为什么？
+    //在for循环里面的匿名函数执行 return i 语句的时候，由于匿名函数里面没有i这个变量，所以这个i他要从父级函数中寻找i，而父级函数中的i在for循环中，当找到这个i的时候，
+    // 是for循环完毕的i，也就是5，所以这个box得到的是一个数组[5,5,5,5,5]。
+
+    //解决方案1
+    function box(){
+        var arr = [];
+        for(var i=0;i<5;i++){
+            arr[i] = (function(num){                    //自我执行，并传参(将匿名函数形成一个表达式)(传递一个参数)
+                return num;                            //这里的num写什么都可以
+            })(i);                                    //这时候这个括号里面的i和上面arr[i]的值是一样的都是取自for循环里面的i
+        }
+        return arr;
+    }
+    //alert(box()[0]);
+
+    //解决2
+    function box(){
+        var arr = [];
+        for(var i=0;i<5;i++){
+            arr[i] = (function(num){
+                //num在这里                                    //原理和上面一种方法一样的，所以可以实现闭包
+                return function(){                        //在这个闭包里面再写一个匿名函数
+                    return num;
+                };
+            })(i)
+        }
+        return arr;
+    }
+    var b = box();
+    //alert(b[0]());
+    //alert(box()[0]());
+    //方案3
+    function box(){ //这样把匿名函数自我执行的时候赋值给一个变量，那么圆括号是可以去掉的
+        var arr = [];
+        for(var i=0;i<5;i++){
+            arr[i] = function(num){
+                return num;
+            }(i);
+        }
+        return arr;
+    }
+    alert(box());
+</script>
+</html>

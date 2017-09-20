@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>实现vue组件</title>
+</head>
+<body>
+
+</body>
+<script>
+    /*
+    * vue实例化一个组件可以分成三步。
+     使用extend定义（构造）组件MyComponent
+     使用component注册组件
+     在初始化app实例的过程中，渲染组件
+    * */
+    //定义组件
+    bue.extend = function (extendOptins) {
+        let Super = this ;
+        extendOptins = extendOptins || {};
+        let Sub = createClass();
+        Sub.prototype = Object.create(Super.prototype);
+        Sub.prototype.constructor = Sub;
+        Sub.options = _.mergeOptions(Super.options, extendOptions);
+        return Sub;
+    }
+
+    function createClass() {
+        return new Function('return function BueComponent(options){ this._init(options)}')();
+    }
+
+    //注册组件
+    /*
+     @param name {String}, 比如 'my-component'
+     注册组件其实就是声明组件与自定义标签的对应关系，
+     比如声明MyComponent组件对应于标签，这样程序解析到才知道：“哦，原来它就是MyComponent组件。”
+    * */
+    bue.component = function (name,defintion) {
+        this.options.components[name] = defintion;
+        return defintion;
+    };
+
+    /*
+    渲染组件
+    这一步比较复杂，让我们将它细分为以下三个步骤。
+    识别组件
+    组件指令化
+    渲染、挂载组件
+    */
+    /*
+    * 识别组件
+
+     在初始化app这个Vue实例的过程中，当DOM遍历解析到的时候，
+     由于我们在上面已经进行了组件注册，所以我们知道那是一个组件，需要特殊处理。
+    * */
+
+
+    /*
+    * 组件指令化
+
+     在我们识别出标签是一个组件之后，该如何对待这个组件呢？
+     文章开头就讲到过，组件与子实例是类似的，我们当初处理“v-if”条件渲染的时候，就是检查到“v-if”是一个特殊的指令，
+     然后就将“v-if”里面的DOM结构当成Vue实例来处理。
+     这里，我们可以采用类似的方法，引入组件指令的概念，把当做一个组件指令。
+    * */
+
+
+    /*
+    *
+    * 渲染、挂载组件
+    * 要想渲染组件，有两个关键点。
+
+     如何处理组件的模板？也就是template参数：<p>{{message}}</p>
+     如何处理组件的props？也就是message="hello, liangshaofeng!" 和 message="hello, Vue!"
+    * */
+
+
+    /*
+    *
+    * 模板处理
+
+     组件options当中的template是一个字符串，代表着一个DOM结构。如何将这个字符串“
+    * */
+
+    /*
+    *
+    * props处理
+
+     组件是有自己的数据属性的，这跟子实例不同。子实例不仅能访问自己的数据，还能访问父实例的数据。但是组件只能访问自己的数据，
+     不能访问父实例/父组件的数据，组件想要访问的数据必须显式地通过props传递给它，
+     像这样：<my-component message="hello liangshaofeng!"></my-component>。这是实现组件化的通用手法，React也是如此。
+    * */
+
+
+    /*
+    * bind方法
+
+     在处理完模板解析和props解析之后，我们终于来到了最后一步，编写组件指令的bind方法，真正地初始化组件实例。
+    * */
+
+    /*
+    * 无论是动态prop还是静态prop，都是prop，都要像处理静态prop那样，把它们解析出来，然后塞到$data当中去。这一点好办
+    * ，因为我们在上一篇 #92 中已经实现了静态prop的解析和渲染。
+     对于动态prop，需要特殊处理。要做到当父实例的数据发生改变的时候，子组件也跟着改变。
+     要实现第二点，又有两种思路：
+
+     当父实例的数据发生改变时，将改变传导到子组件（就像处理条件渲染 #90 那样）。子组件接收到变化信号之后，跑到父实例去拿新的数据，
+     然后更新自己本身的数据，然后触发notify，然后更新DOM。
+     当父实例的数据发生改变时，父实例直接修改子组件对应的数据，然后触发notify，然后更新DOM。
+    * */
+
+    /*
+    *
+    * 事件初始化
+
+     我们需要将事件及其回调函数注册到child实例上，这样当其他组件（无论是父组件还是子组件）传来消息的时候，程序才能知道该触发哪个事件，
+     该执行哪个回调函数。
+    * */
+
+    /*
+    * 触发及传播事件
+
+     无论是$dispatch还是$broadcast，他们都有类似的步骤。
+
+     如果是向上冒泡事件
+
+     在当前组件实例触发($emit)事件，执行对应的回调函数。如果事件return true，那么代表事件可传播，执行第2步。如果事件不可传播，结束。
+     找出当前组件的父组件。没有父组件？结束。有父组件？把父组件当成当前组件，重新执行第1步。
+     如果是向下广播事件
+
+     找出当前组件的所有子组件。没有子组件？结束。有子组件？执行第2步。
+     深度遍历所有子组件，把子组件当成当前组件，触发($emit)事件，执行对应的回调函数。如果事件return true，那么代表事件可传播，
+     重新执行第1步。如果事件不可传播，结束。
+    *
+    *
+    * 注意：Vue在广播事件的时候，是不会在发起广播事件的组件触发该事件的，只会从它的下一个子组件开始触发。这与冒泡事件稍有不同。
+    * */
+
+
+    /*
+    * 兄弟A将消息发到兄弟A、B共同的父节点C，然后再经由C转发给兄弟B。但是这样做有一个弊端，当节点很多的时候，这种传递方式就会显得杂乱无章。
+    * 那么，传统的计算机是如何解决众多兄弟节点（比如，CPU、内存、硬盘等等）
+    * 之间的通信的呢？答案是总线机制。这么良好的思想，我们前端怎么能不借鉴呢？所以就有了redux（react）和vuex这些状态管理器。
+    * */
+
+</script>
+</html>

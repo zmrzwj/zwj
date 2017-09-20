@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script>
+    /*var myNumber = {
+        value: 1,
+        add: function(i){
+            var helper = function(i){
+                console.log(this);
+                this.value += i;
+                console.log(this.value);//NaN
+            };
+            helper(i);
+        }
+    };*/
+
+
+    var myNumber = {
+        value: 1,
+        add: function(i){
+            var helper = (i)=>{
+                console.log(this);
+                this.value += i;
+                console.log(this.value);//2 箭头函数改变this指向
+            };
+            helper(i);
+        }
+    };
+    myNumber.add(1);
+
+
+
+</script>
+</html>
