@@ -1,0 +1,21 @@
+Stream API ,
+流的拼接（pipe）
+pipe方法接受一个输出流（Writable Stream）对象作为参数，同时返回该输出流的引用，
+如果，该作为参数的输出流是一个Duplex Stream，也即返回值同时也是一个Readable Stream，则可以用这种方式拼接：streamA.pipe(streamB).pipe(streamC)....
+拼接的起点，即第一个流，可以是只读流（即不可写的Readable Stream）；
+拼接的终点，即最后一个流，可以是纯输出流（即不可读的Writable Stream）；位于中间的流必须是Duplex Stream。
+流水线（pipeline）
+其实就是将多个流，通过pipe进行拼接，得到一个有序的流序列，数据从一端写入，依次进入每一个流（通常是transform stream）中进行处理，并从最后一个流输出。
+
+Gulp是一个基于流的构建工具，因此十分灵活，其API也十分简单，
+就4个方法 src, dest, task, watch，分别用于输入数据，输出数据，定义任务，监控文件的变化并执行指定的任务。
+
+一些Gulp相关或Stream相关的工具:
+vinyl-fs: 用于读取指定路径的文件并封装成vinyl格式的对象流，或者将vinyl对象流写入文件系统指定路径，该工具该支持glob；该工具其实是gulp的src和dest的底层实现
+vinyl-buffer: 读取一个vinyl对象流，并将流中的vinyl对象的内容（即contents属性，该工具主要是针对contents为Stream的对象，对于contents为Buffer类型的，则原样输出）全部读取并封装到一个Buffer中，返回一个相同的vinyl对象，但是将其contents换成封装好的Buffer
+vinyl-source-stream: 用于将一个Stream封装成一个vinyl对象，即创建一个vinyl对象，给它指定一个文件名，并将其contents设置为该Stream；需要注意的是，由于要封装的流本身只是一个流，并不是一个文件，所以这里指定的文件名是由用户随意指定的，可以说是假的文件名，但是这个假的文件名也可以被下游的输出流利用，例如使用该vinyl对象的文件名和路径将文件写到实际的文件系统中
+bl(buffer-list): 用于从一个输入流中读取所有buffer直到不再有新的数据，并按顺序拼接成单一个Buffer，并通过回调交给调用者；目前的vinyl-buffer的实现就是用了这个工具
+through/through2: 用于方便的创建一个transform stream，只需要指定要创建的流的模式和transform方法，就可以得到一个可用的转换流，而不需要自己去实现繁琐的流的读写控制，以及由于NodeJS历史原因造成的各种兼容性问题，许多流相关的工具都是基于该模块完成的
+concat-stream: 用于拼接多个stream，与pumpify类似，可用于创建pipeline
+pumpify: 同上
+ordered-read-streams: 用于读取多个指定顺序的Readable Stream的内容，并按顺序传递到给用户，由于多个流本身的读取是异步的，所以不容易做到这一点，我们可以选择将所有的stream的内容读取完，然后在排个序交给下游，但是这个工具很巧妙地让数据可以尽快地流入下游而不需要等待所有stream都读取完，有兴趣可以欣赏以下它的源码

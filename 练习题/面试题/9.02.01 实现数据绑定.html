@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>实现数据绑定</title>
+</head>
+<body>
+<div id="app">
+    <div>{{title}}</div>
+    {{name}}
+    <input v-model="deep.name.name">
+    {{name}}
+    <div id="test">多了一层：<div>123456{{name}}</div></div>
+    <div>{{deep.name.name}}</div>
+    <div>{{title}}</div>
+</div>
+
+<input id="input">
+
+<!--<input >
+<div id="compile">
+    {{123}}
+    <div>
+        <div>
+            {{123}}
+        </div>
+        {{123}}
+    </div>
+</div>-->
+
+<div style="position: absolute;right:10px;float: left">zwj</div>
+</body>
+<!--
+单向绑定的优点是相应的可以带来单向数据流，这样做的好处是所有状态变化都可以被记录、跟踪，状态变化通过手动调用通知，源头易追溯，
+没有“暗箱操作”。同时组件数据只有唯一的入口和出口，使得程序更直观更容易理解，有利于应用的可维护性。缺点则是代码量会相应的上升，
+数据的流转过程变长，从而出现很多类似的样板代码。同时由于对应用状态独立管理的严格要求(单一的全局store)，在处理局部状态较多的
+场景时(如用户输入交互较多的“富表单型”应用)，会显得啰嗦及繁琐。基本上双向绑定的优缺点就是单向绑定的镜像了。优点是在表单交互较多的场景下，
+会简化大量业务无关的代码。缺点就是由于都是“暗箱操作”，我们无法追踪局部状态的变化(虽然大部分情况下我们并不关心)，
+潜在的行为太多也增加了出错时 debug 的难度。同时由于组件数据变化来源入口变得可能不止一个，新手玩家很容易将数据流转方向弄得紊乱，
+如果再缺乏一些“管制”手段，最后就很容易因为一处错误操作造成应用雪崩
+
+
+-->
+<script>
+    // vue数组的变异方法
+    /*
+    * vue 官网
+    * 1.变化数组方法：会对原数组操作的数组方法，如 pop(), shift(), unshift(), splice(), sort() 和 reverse()。
+      2.非变化数组方法：不会对原数组操作、返回新数组的数组方法，如 filter(), concat() 和 slice()。
+      3.变异方法：Vue 将观察数组(observed array)的变化数组方法(mutation method)包裹起来，以便在调用这些方法时，也能够触发视图更新。
+     Vue 不能检测以下变动的数组：
+     当你利用索引直接设置一个项时，例如： vm.items[indexOfItem] = newValue
+     当你修改数组的长度时，例如： vm.items.length = newLength
+    * */
+
+    //把src覆盖target原型，给数组添加变异方法有用
+    function protoAugment (target, src) {
+        /* eslint-disable no-proto */
+        target.__proto__ = src;
+        /* eslint-enable no-proto */
+    }
+
+    //给对象赋值
+    function def (obj, key, val, enumerable) {
+        console.log("val:",val);
+
+        Object.defineProperty(obj, key, {
+            value: val,
+            enumerable: !!enumerable,
+            writable: true,
+            configurable: true
+        });
+    }
+
+    var arrayProto = Array.prototype;
+    var arrayMethods = Object.create(arrayProto);
+    [
+        'push',
+        'pop',
+        'shift',
+        'unshift',
+        'splice',
+        'sort',
+        'reverse'
+    ].forEach(function (method) {
+            // cache original method
+            var original = arrayProto[method];
+            def(arrayMethods, method, function mutator () {//arrayMethods的push等方法替换为mutator，则每次调用时就会console.log
+                var arguments$1 = arguments;
+
+                // avoid leaking arguments:
+                // http://jsperf.com/closure-with-arguments
+                var i = arguments.length;
+                var args = new Array(i);
+                while (i--) {
+                    args[i] = arguments$1[i];
+                }
+                var result = original.apply(this, args);
+                var ob = this.__ob__;
+                var inserted;
+                switch (method) {
+                    case 'push':
+                        inserted = args;
+                        break;
+                    case 'unshift':
+                        inserted = args;
+                        break;
+                    case 'splice':
+                        inserted = args.slice(2);
+                        break
+                }
+               // if (inserted) { ob.observeArray(inserted); }
+                // notify change
+                ob.dep.notify();
+                console.log("改变了",result);
+                return result
+            });
+    });
+
+    //test
+   /* var a = [];
+    a.__proto__ = arrayMethods;//把原型替换，才会有效
+    var i=0;
+    setInterval(function () {
+        a.push(i++);
+        console.log(a);
+    },1000);*/
+
+   /* var r=0;
+    function val() {
+        console.log("hello");
+        r++;
+        return r;
+    }
+
+    var data = {name:123};
+
+    Object.defineProperty(data, "name", {
+        value: val,
+        writable: true,
+        configurable: true
+    });
+
+    setInterval(function () {
+        var t =data.name;
+        console.log("t",t());
+    },1000)*/
+
+</script>
+<script>
+    //实现观察者,循环监听所以值
+    //创建容纳订阅者的队列，Dep,属性变化执行订阅者的更新函数
+    function Observer(data) {
+        this.data = data;
+        this.dep = new Dep();
+
+       /* if(!data || typeof data !== "object"){
+            return;
+        }*/
+
+        def(data,"__ob__",this);//把data.__ob__ == this;
+
+        if(Array.isArray(data)){
+            protoAugment(data,arrayMethods);
+            this.observeArray(data);
+        }else {
+           /* Object.keys(data).forEach(function (key) {
+                defineReactive(data,key,data[key])
+            })*/
+
+            this.walk(data);
+        }
+    }
+
+    Observer.prototype.walk = function (obj) {
+        var keys = Object.keys(obj);
+        for (var i = 0; i < keys.length; i++) {
+            defineReactive(obj, keys[i], obj[keys[i]]);
+        }
+    };
+
+    function defineReactive(data,key,val) {
+        var childOb = observe(val);
+        var dep =new Dep();//要每个值都要分别设置dep,因为对每个key监听的watcher都不同
+        console.log(data+"监听"+key);
+        Object.defineProperty(data,key,{
+            enumerable:true,
+            configurable:true,
+            get:function () {
+                if(Dep.target){//判断是否需要添加订阅者
+                    dep.addSub(Dep.target);// 在这里添加一个订阅者
+                    //childOb.dep.addSub(Dep.target);
+                }
+
+                return val;
+            },
+            set:function (newValue) {
+                if(val === newValue){
+                    return
+                }
+                val = newValue;
+                console.log("监听到"+key+"变化为"+newValue);
+
+                dep.notify();//如果数据变化，通知所有订阅者
+            }
+        });
+/*
+        if(typeof val === "object"){
+            var keys = Object.keys(val);
+            for (var i = 0; i < keys.length; i++) {
+                defineReactive(val, keys[i], val[keys[i]]);
+            }
+        }*/
+    }
+
+    function observe(data) {
+        if (typeof  data !== "object") {
+            return
+        }
+        var ob;
+        ////如果这个数据身上已经有ob实例了,那observe过了，就直接返回那个ob实例
+        if ( data['__ob__'] && data.__ob__ instanceof Observer) {
+            ob = data.__ob__;
+        }else {
+            ob = new Observer(data);
+        }
+
+        console.log("ob-----",ob);
+        return ob
+    }
+
+    //观察数组变化
+    Observer.prototype.observeArray=function(items) {
+        for (var i = 0, l = items.length; i < l; i++) {
+            observe(items[i]);
+        }
+    };
+
+
+    function Dep() {
+        this.subs = [];//有哪些订阅了
+    }
+
+    Dep.prototype = {
+        addSub:function (sub) {
+            this.subs.push(sub)
+        },
+        notify:function () {
+            this.subs.forEach(function (sub) {
+                sub.update();
+            })
+        }
+    };
+
+    Dep.target = null;//Dep.target上缓存下订阅者，添加成功后再将其去掉就可以了
+
+
+   /* var el = document.getElementById("test");
+    var vue = new selfVue({
+        name:"hello"
+    },el,'name');
+
+    var i = 0;
+    setInterval(function () {
+        vue.name = i;
+        i++;
+    },1000);*/
+
+    //test textNode
+    /*var compile = document.getElementById("compile");
+    var compileText = compile.textContent;
+    console.log("textContent",compile.textContent);
+    var reg = /\{\{(.*)\}\}/;
+    console.log("textContent",reg.exec(compileText));
+    compile.textContent = "zwj";*/
+    /*var test = {
+        one:"wo is zwj",
+        two:{
+            child:"wo is hyc"
+        }
+    };
+
+    observe(test);
+    test.one = "zwj";
+    test.two.child = "hyc";
+    var obj = {
+    };*/
+   /* Object.defineProperty(obj,"value",{
+        set:function (newValue) {
+            document.getElementById("test").innerText = newValue;
+        },
+        get:function () {
+            return  document.getElementById("test").innerText;
+        }
+    });
+    var i=0;
+    setInterval(function () {
+        obj.value = i;
+        i++;
+    },1000)*/
+
+</script>
+<script>
+    //实现观察者
+    function Watcher(vm,exp,cb) {
+        this.cb = cb;//回调函数
+        this.vm = vm;//会传个vue对象进来
+        this.exp = exp;//需要监听的key
+        this.value = this.get();//读取vm初始值，并加入观察队列
+    }
+
+    Watcher.prototype = {
+        update:function () {
+            this.run();
+        },
+        run:function () {
+            var value = this.vm[this.exp];//this.vm.data == vue.data
+            var oldVal = this.value;
+
+            if(value !== oldVal){
+                this.value = value;
+                console.log("Watcher oldVal:",oldVal);
+                this.cb.call(this.vm,value,oldVal);
+            }
+        },
+        get:function () {
+            Dep.target = this;//缓存自己
+            var value = this.vm[this.exp]; // 发送数据读取会执行监听器里的get函数
+            Dep.target = null; // 释放自己
+            return value;
+        }
+    };
+</script>
+<script>
+    //关联watcher与observe
+    function selfVue(options) {
+        var self = this;
+        this.data = options.data;
+        this.methods = options.methods;
+
+        Object.keys(this.data).forEach(function (key) {//遍历将所以数据变化绑定到this上
+            self.proxyKeys(key);
+        });
+
+        new Observer(this.data);
+
+        new Compile(options.el,this);
+        options.mounted.call(this);
+
+        /*el.innerHTML = this.data[exp];//exp是模版，就是{{name}}里的name.
+
+         new Watcher(this,exp,function (value) {
+         el.innerHTML = value;
+         });*/
+        return this;//链式编程
+    }
+
+    //'selfVue.name = 'canfoo' 而不是'selfVue.data.name = 'canfoo'，我们需要在new SelfVue的时候做一个代理处理，让访问selfVue的属性代理为访问selfVue.data的属性
+    selfVue.prototype = {
+        proxyKeys:function (key) {
+            var self = this;
+            //把key的变化绑定到this上
+            Object.defineProperty(this,key,{
+                get:function proxyGetter() {
+                    return self.data[key];
+                },
+                set:function proxySetter(newVal) {
+                    self.data[key] = newVal;
+                }
+            })
+        }
+    };
+</script>
+<script>
+    //实现compile
+    /*1.解析模板指令，并替换模板数据，初始化视图
+
+     2.将模板指令对应的节点绑定对应的更新函数，初始化相应的订阅器*/
+    function Compile(el,vm) {
+        this.vm = vm;
+        this.el = document.querySelector(el);
+        this.fragment = null;
+        this.init();
+    }
+
+    Compile.prototype = {
+        init:function () {
+            if(this.el){
+                this.fragment = this.nodeToFragment(this.el);
+                this.compileElement(this.fragment);//处理指令，事件，模版{{}}
+                this.el.appendChild(this.fragment);//插回去
+            }else {
+                console.log("节点不存在");
+            }
+        },
+        nodeToFragment:nodeToFragment,
+        compileElement:compileElement,
+        compileText:compileText,
+        compile:compile,
+        compileEvent:compileEvent,
+        compileModel:compileModel,
+        modelUpdater:modelUpdater,
+        updateText:updateText,
+        isDirective:isDirective,
+        isEventDirective:isEventDirective,
+        isTextNode:isTextNode,
+        isElementNode:isElementNode
+    };
+
+
+    //这个环节需要对dom操作比较频繁，所有可以先建一个fragment片段，将需要解析的dom节点存入fragment片段里再进行处理
+    function nodeToFragment(el) {
+        var fragment = document.createDocumentFragment();
+        var child = el.firstChild;
+        while(child){
+           // console.log("child",child);
+            fragment.appendChild(child);//把第一个孩子放到fragment，el中会被删除掉，child只有一份
+            child = el.firstChild;
+        }
+       // console.log("fragment",fragment);
+        return fragment;
+    }
+
+    //遍历各个节点,只对带有 '{{变量}}' 这种形式的指令进行处理
+    function compileElement(el) {
+        var childNodes = el.childNodes;
+        var self = this;
+        //console.log(childNodes);
+        [].slice.call(childNodes).forEach(function (node) {
+            var reg = /\{\{(.*)\}\}/;//. 匹配除换行符 \n 之外的任何单字符
+            var text = node.textContent;
+
+            if(self.isElementNode(node)){
+               // console.log("ElementNode:",node);
+                self.compile(node);
+            }else if(self.isTextNode(node) && reg.test(text)){
+               // console.log("text:",node);
+                self.compileText(node,reg.exec(text)[1]); //reg.exec(text)[1] 会得到[{{name}},name],所以去第2个值
+            }
+
+            if(node.childNodes && node.childNodes.length){
+                self.compileElement(node); //对子节点的子节点解析
+            }
+
+        })
+    }
+
+    function compileText(node,exp) {
+        var self = this;
+        if(exp.indexOf('.') === -1){
+            var initText = this.vm[exp];
+            this.updateText(node,initText);//为节点把模版替换为数据
+
+            new Watcher(this.vm,exp,function (value,oldValue) {
+                self.updateText(node,value,oldValue); //数据变化也更新node
+            });
+        }else {
+            var expArray = exp.split(".");
+            initText = this.vm;
+            (function () {
+                expArray.forEach(function (v) {
+                    if(initText){
+                        initText = initText[v];
+                    }
+                })
+
+            })();
+            this.updateText(node,initText);
+            var expLast = expArray.pop();
+            var expParent = this.vm ;
+            expArray.forEach(function (v) {
+                expParent = expParent[v];
+            });
+            console.log("expParent",expParent);
+            console.log("expLast",expLast);
+            new Watcher(expParent,expLast,function (value,oldValue) {
+                self.updateText(node,value,oldValue); //数据变化也更新node
+            });
+        }
+
+
+    }
+
+    function updateText(node ,value,oldValue) {
+        var reg = /\{\{(.*)\}\}/g;//. 匹配除换行符 \n 之外的任何单字符
+        console.log("oldValue",oldValue);
+        if(oldValue === undefined){
+            node.textContent = node.textContent.replace(reg,value); //对文本节点可以通过node.textContent = “”替换文本内容
+        }else {
+            node.textContent = node.textContent.replace(oldValue,value);
+        }
+
+    }
+
+    //指令的解析编译
+    function compile(node) {
+        var nodeAttrs = node.attributes;//返回的是{}对象
+        var self = this;
+        Array.prototype.forEach.call(nodeAttrs,function(attr){
+            var attrName = attr.name;//attr.name是属性名，attr.value是属性值 v-on:click="clickMe"  v-model="name"
+            if(self.isDirective(attrName)){//是否以v-开头
+                var exp = attr.value;  //methods里的方法名
+                var dir = attrName.substring(2);//去掉v-
+                if(self.isEventDirective(dir)){//是否以on开头 dir == on:click
+                    self.compileEvent(node,self.vm,exp,dir);
+                }else{//不以on开头
+                    self.compileModel(node,self.vm,exp,dir);
+                }
+
+                node.removeAttribute(attrName);
+            }
+        })
+    }
+
+    function compileEvent(node, vm, exp, dir) {
+        var eventType = dir.split(":")[1];
+        var cb = vm.methods && vm.methods[exp];
+
+        if(event && cb){
+            node.addEventListener(eventType,cb.bind(vm),false);//true - 事件句柄在捕获阶段执行. false- 默认。事件句柄在冒泡阶段执行
+        }
+    }
+
+    function compileModel(node,vm,exp,dir) {
+        var self = this;
+        var val = vm;
+        if(exp.indexOf(".") === -1){
+            val = val[exp];
+
+            new Watcher(this.vm,exp,function (value) {
+                self.modelUpdater(node,value);//value变化更新到input
+            });
+
+            node.addEventListener("input",function (e) {//vue中的输入框默认监听的是input事件
+                var newValue = e.target.value;
+                if(val === newValue){
+                    return;
+                }
+
+                self.vm[exp] = newValue;
+                val = newValue;
+
+            })
+
+        }else {
+            var expArray = exp.split(".");
+            expArray.forEach(function (v) {
+                val = val[v];
+            });
+
+            var expLast = expArray.pop();
+            var expParent = this.vm ;
+            expArray.forEach(function (v) {
+                expParent = expParent[v];
+            });
+
+            new Watcher(expParent,expLast,function (value) {
+                self.modelUpdater(node,value);//value变化更新到input
+            });
+
+            node.addEventListener("input",function (e) {//vue中的输入框默认监听的是input事件
+                var newValue = e.target.value;
+                if(val === newValue){
+                    return;
+                }
+
+                expParent[expLast] = newValue;
+                val = newValue;
+
+            })
+        }
+
+        this.modelUpdater(node,val);
+
+    }
+
+    function modelUpdater(node, value, oldValue) {
+        console.log("node.value",value);
+        node.value = typeof value == "undefined" ? "": value;
+    }
+
+    function isDirective(attr) {
+        return attr.indexOf("v-") == 0;
+    }
+
+    function isEventDirective(dir) {
+        return dir.indexOf("on:") == 0;
+    }
+
+    function isTextNode(node) {
+        return node.nodeType == 3; //文本 3 , 元素 1   ,  属性	2
+    }
+
+    function isElementNode(node) {
+        return node.nodeType == 1;
+    }
+
+</script>
+<script>
+    //测试
+    //test
+    new selfVue({
+        el:"#app",
+        data:{
+            title:"我的vue",
+            name:"zwj name",
+            deep:{
+              name:{
+                  name:"zwj"
+              }
+            },
+            array:[1,2,3]
+        },
+        mounted:function () {
+            var self = this;
+            setTimeout(function () {
+                self.name = "hello,vue";
+            },2000);
+
+            setTimeout(function () {
+                self.array.push(5);
+            },1500);
+
+           /* setTimeout(function () {
+                self.deep.name="2 hyv";
+
+                console.log(self)
+
+            },1500);*/
+        }
+    });
+</script>
+<script>
+    var input = document.getElementById("input");
+    input.addEventListener("input",function (event) {
+        console.log(event.target.value);
+    },false)
+</script>
+<script>
+   /* var testdata = {
+        name:{
+            name:"zwj"
+        }
+    };
+    Object.defineProperty(testdata.name,"name",{
+        enumerable:true,
+        configurable:true,
+        get:function () {
+            /!*if(Dep.target){//判断是否需要添加订阅者
+                //dep.addSub(Dep.target);// 在这里添加一个订阅者
+                //childOb.dep.addSub(Dep.target);
+            }*!/
+            //return val;
+        },
+        set:function (newValue) {
+
+           // val = newValue;
+            console.log("监听到"+"变化为"+newValue);
+
+           // dep.notify();//如果数据变化，通知所有订阅者
+        }
+    });
+
+    var t=0;
+    setInterval(function () {
+        testdata.name.name = t++;
+    },1500)*/
+
+</script>
+</html>

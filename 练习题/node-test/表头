@@ -1,0 +1,32 @@
+CJ_MP_ID	测量点标识		Y	Y
+DATA_DATE	数据时标		Y	Y		精确到分
+DATA_SOURCE	数据来源					0——采集
+1——手工录入
+3——接口导入
+4——系统自动修正
+5——电表冻结
+6——终端冻结
+WRITE_DATE	写入日期
+PZ	总有功功率					KW
+PA	A相有功功率					KW
+PB	B相有功功率					KW
+PC	C相有功功率					KW
+QZ	总无功功率					Kvar
+QA	A相无功功率					Kvar
+QB	B相无功功率					Kvar
+QC	C相无功功率					Kvar
+UA	A相电压					V
+UB	B相电压					V
+UC	C相电压					V
+IA	A相电流					A
+IB	B相电流					A
+IC	C相电流					A
+COS	总功率因数					%
+COSA	A相功率因数					%
+COSB	B相功率因数					%
+COSC	C相功率因数					%
+MID_I	零序电流					A
+
+PI_RATIO	PT变比值					测量点的PI_PATIO*MP_RATED_VOLT（字典表对应的值，比如1.732或1等）
+CT_RATIO	CT变比值
+T_FACTOR	综合倍率

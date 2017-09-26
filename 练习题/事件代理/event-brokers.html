@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<style>
+    div{
+        width: 200px;
+        height: 500px;
+        outline: 1px solid #cccccc;
+    }
+</style>
+<body>
+<ul id="test">
+    <li>
+        <p>111</p>
+    </li>
+    <li>
+        <div>222</div>
+    </li>
+    <li>
+        <span>333</span>
+    </li>
+    <li>000</li>
+</ul>
+</body>
+<script type="text/javascript">
+
+    window.onload = function(){
+        var oUl = document.getElementById('test');
+        oUl.addEventListener('click',function(ev){
+            var target = ev.target;
+
+
+            while(target !== oUl ){
+                if(target.tagName.toLowerCase() == 'li'){
+                    //console.log(target);
+
+                    break;
+                }
+                target = target.parentNode;
+            }
+        });
+
+    };
+
+</script>
+</html>

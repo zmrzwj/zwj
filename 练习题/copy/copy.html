@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="copy">
+zsfvszhgshshshshjshj
+</div>
+</body>
+<script type="text/javascript" src="jquery.js"></script>
+<script>
+    /*var copy = document.getElementById("copy");
+    copy.oncopy = function (e) {
+
+        var e = e || window.event;
+
+        e.stopPropagation();
+        e.preventDefault();
+        var cd = e.originalEvent.clipboardData || window.clipboardData;
+
+        /!*!//ie
+        if(!cd){
+            cd = window.clipboardData;
+        }*!/
+
+       /!* var cp = document.selection.createRange().text;*!/
+
+       cd.setData("text/plain","zje");
+
+        //console.log();
+    }*/
+
+    $("#copy").bind({
+        copy: function(e) {//copy事件
+            var cpTxt = "复制的数据";
+            var clipboardData = window.clipboardData; //for IE
+            if (!clipboardData) { // for chrome
+                clipboardData = e.originalEvent.clipboardData;
+            }
+            //e.clipboardData.getData('text');//可以获取用户选中复制的数据
+           // clipboardData.setData('Text', cpTxt);
+           // alert(cpTxt);
+            //$('#message').text('Copy Data : ' + cpTxt);
+            return false;//否则设不生效
+        },paste: function(e) {//paste事件
+            var eve = e.originalEvent;
+            var cp = eve.clipboardData;
+            var data = null;
+            var clipboardData = window.clipboardData; // IE
+            if (!clipboardData) { //chrome
+                clipboardData = e.originalEvent.clipboardData
+            }
+            data = clipboardData.getData('Text');
+           console.log(data);
+        }
+    })
+</script>
+</html>

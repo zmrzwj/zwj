@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <!--code here-->
+    <title>demo</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        #J_container{
+            width: 100%;
+        }
+
+        .record-head div{
+            width: 13%;
+            box-sizing: border-box;
+        }
+
+        .record-head .tel{
+            width: 35%;
+        }
+
+        .head, li div {
+            display: inline-block;
+            width: 13%;
+            box-sizing: border-box;
+            text-align: center;
+            outline: 1px solid #ccc;
+            padding: 3px 0;
+            line-height: 1.42857143;
+        }
+
+        /*.record-head div{
+            width: auto;
+        }*/
+        li{
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .tel{
+           width: 35%;
+        }
+
+       /* li .id, li .sex, .id, .sex {
+            width: 9.375%;
+        }
+
+        li .name, .name {
+            width: 25%;
+        }
+
+        li .tel, .tel {
+            width: 56.25%;
+        }
+
+        li .del, .del {
+            width: 9.375%;
+        }*/
+
+        ul {
+            list-style: none;
+        }
+
+        .user-delete {
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+
+<body>
+<div id="J_container">
+    <div class="record-head">
+        <div class="head id">序号</div><div class="head name">姓名</div><div class="head sex">性别</div><div class="head tel">电话号码</div><div class="head province">省份</div><div class="head">操作</div>
+    </div>
+    <ul id="J_List">
+        <li><div class="id">1</div><div class="name">张三</div><div class="sex">男</div><div class="tel">13788888888</div><div class="province">浙江</div><div class="user-delete">删除</div></li>
+        <li><div class="id">2</div><div class="name">李四</div><div class="sex">女</div><div class="tel">13788887777</div><div class="province">四川</div><div class="user-delete">删除</div></li>
+        <li><div class="id">3</div><div class="name">王二</div><div class="sex">男</div><div class="tel">13788889999</div><div class="province">广东</div><div class="user-delete">删除</div></li>
+    </ul>
+</div>
+
+<script>
+    // 此处也可换成ES6的写法
+    /*function Contact(){
+        this.init();
+    }
+
+    // your code here
+    Contact.prototype.init = function(){
+        var J_List=document.getElementById("J_List");
+        J_List.addEventListener("click",function (event) {
+            var target = event.target;
+            while (target !== J_List){
+                if(target.className == "user-delete"){
+                    var deleteNode = target.parentNode;
+                    J_List.removeChild(deleteNode);
+                    break;
+                }
+            }
+        })
+    };
+
+    new Contact();*/
+
+    class contact{
+        init(){
+            var J_List=document.getElementById("J_List");
+            J_List.addEventListener("click",function (event) {
+                var target = event.target;
+                while (target !== J_List){
+                    if(target.className == "user-delete"){
+                        var deleteNode = target.parentNode;
+                        J_List.removeChild(deleteNode);
+                        break;
+                    }
+                }
+
+            })
+        }
+    }
+
+    new contact().init();
+
+</script>
+</body>
+</html>

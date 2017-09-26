@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>变换为源二叉树的镜像</title>
+</head>
+<body>
+
+</body>
+<script>
+    function treeMirror(trees) {
+        if(trees == null || trees === undefined){
+            return ;
+        }
+
+        var left = trees.left;
+        var right = trees.right;
+
+        var temp = right ;
+        trees.right = left;
+        trees.left = temp;
+
+        treeMirror(left);
+        treeMirror(right);
+    }
+
+    //test
+    var json = {
+        left:{
+            left:{
+                left:1,
+                right:2
+            },
+            right:{
+                left:3,
+                right:4
+            }
+        },
+        right:{
+            left:{
+                left:5,
+                right:6
+            },
+            right:{
+                left:7,
+                right:8
+            }
+        }
+    };
+
+    //console.log(JSON.stringify(json));
+
+   // treeMirror(json);
+
+  //  console.log(JSON.stringify(json));
+
+    /*
+    * 非递归的思想：我们按照广度遍历二叉树的顺序，逐个处理遍历的节点。当处理的当前节点，
+    * 如果有孩子节点，我们交换它们的孩子节点，并且把它们的非空孩子入队列。
+    * */
+    function treeMirror2(json) {
+        var queue = [];
+        var pointer = json;
+        while(pointer){
+            swap(pointer);
+            if(pointer.left){
+                queue.push(pointer.left);
+            }
+            if(pointer.right){
+                queue.push(pointer.right);
+            }
+
+            if(queue.length !== 0){
+                pointer = queue.shift();
+                console.log("pointer:",pointer);
+            }else {
+                break;
+            }
+        }
+    }
+
+    function swap(data) {
+        var temp  = data.left;
+        data.left = data.right;
+        data.right = temp;
+    }
+
+    var json2 = {
+        left:{
+            left:{
+                left:1,
+                right:2
+            },
+            right:{
+                left:3,
+                right:4
+            }
+        },
+        right:{
+            left:{
+                left:5,
+                right:6
+            },
+            right:{
+                left:7,
+                right:8
+            }
+        }
+    };
+
+    console.log(JSON.stringify(json2));
+
+    treeMirror2(json2);
+
+    console.log(JSON.stringify(json2));
+
+</script>
+</html>
