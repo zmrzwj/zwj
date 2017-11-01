@@ -1,0 +1,10 @@
+/*背景发光*/
+.light{
+    box-shadow: 0 0 1em #fff,0 0 3em #fff;
+}
+/*字体发光*/
+.font-light{
+    background: #203;
+    color: #ffc;
+    text-shadow: 0 0 .6em,0 0 .9em,0 0 1.9em;
+}/*发光的原理就是多添加几层box-shadow或text-shadow*/
